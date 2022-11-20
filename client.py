@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.x509 import ocsp
 from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID
-
+from datetime import datetime
 from urllib.parse import urljoin
 
 import warnings
@@ -62,13 +62,14 @@ def get_ocsp_server(cert):
 def main():
     parser = argparse.ArgumentParser(description='OCSP Client')
     parser.add_argument('--host', type=str)
+    parser.add_argument('--port', type=int)
     parser.add_argument('--cert', type=str)
 
     args = parser.parse_args()
 
-    if args.host is not None:
+    if args.host is not None and args.port is not None:
         try:
-            cert = get_cert_for_hostname(args.host, 443)
+            cert = get_cert_for_hostname(args.host, args.port)
         except socket.gaierror:
             sys.stderr.write('Name or service not known\n')
             sys.exit(-1)
@@ -80,8 +81,8 @@ def main():
         with open(args.cert, 'rb') as f:
             data = f.read()
         cert = x509.load_pem_x509_certificate(data)
-    elif args.cert is None and args.host is None:
-        sys.stderr.write('Not enough arguments')
+    else:
+        sys.stderr.write('Not enough arguments\n')
         sys.exit(-1)
 
     ca_issuer = get_issuer(cert)
@@ -100,10 +101,18 @@ def main():
 
     conn.close()
 
-    print(f'Hostname: {args.host}')
+    if args.host is not None:
+        print(f'Hostname: {args.host}')
+
     print(f'Issuer: {ca_issuer}')
     print(f'OCSP Server: {ocsp_server}')
-    print(f'Certificate Status: {rsp.read().decode()}')
+    cert_status = rsp.read().decode()
+    if cert_status.strip() != '':
+        print(f'Certificate Status: {cert_status}')
+    else:
+        if cert.not_valid_after.__str__() < datetime.now().__str__().split('.')[0]:
+            print('Certificate Status: Expired')
+            print(f'Expired in {cert.not_valid_after}')
 
 
 if __name__ == '__main__':
