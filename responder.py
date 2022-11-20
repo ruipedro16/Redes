@@ -1,5 +1,6 @@
 #!/bin/env python3
 
+
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from cryptography.x509 import ocsp
 from cryptography.x509.ocsp import OCSPResponseStatus
@@ -22,8 +23,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(ocsp_decoded.certificate_status.__str__().encode())
                 return
             else:
-                raise Exception(f'decoding OCSP response failed: {ocsp_decoded.response_status}')
-        raise Exception(f'fetching OCSP certificate status failed with response status: {ocsp_response.status_code}')
+                raise Exception(f'Decoding OCSP response failed: {ocsp_decoded.response_status}')
+        raise Exception(f'Fetching OCSP certificate status failed with response status: {ocsp_response.status_code}')
 
 
 def main():

@@ -37,7 +37,7 @@ def get_issuer(cert):
     aia = cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_INFORMATION_ACCESS).value
     issuers = [ia for ia in aia if ia.access_method == AuthorityInformationAccessOID.CA_ISSUERS]
     if not issuers:
-        raise Exception(f'no issuers entry in AIA')
+        raise Exception('No issuers entry in AIA')
     return issuers[0].access_location.value
 
 
@@ -47,14 +47,14 @@ def get_issuer_cert(ca_issuer):
         issuerDER = issuer_response.content
         issuerPEM = ssl.DER_cert_to_PEM_cert(issuerDER)
         return x509.load_pem_x509_certificate(issuerPEM.encode('ascii'), default_backend())
-    raise Exception(f'fetching issuer cert  failed with response status: {issuer_response.status_code}')
+    raise Exception(f'Fetching issuer certificate failed with response status: {issuer_response.status_code}')
 
 
 def get_ocsp_server(cert):
     aia = cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_INFORMATION_ACCESS).value
     ocsps = [ia for ia in aia if ia.access_method == AuthorityInformationAccessOID.OCSP]
     if not ocsps:
-        raise Exception(f'no ocsp server entry in AIA')
+        raise Exception('No OCSP server entry in AIA')
     return ocsps[0].access_location.value
 
 
