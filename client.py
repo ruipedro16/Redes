@@ -7,6 +7,7 @@ import ssl
 import base64
 import requests
 import sys
+import os
 
 import http.client as httplib
 
@@ -59,15 +60,30 @@ def get_ocsp_server(cert):
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('host', type=str)
+    parser = argparse.ArgumentParser(description='OCSP Client')
+    parser.add_argument('--host', type=str)
+    parser.add_argument('--cert', type=str)
+
     args = parser.parse_args()
 
-    try:
-        cert = get_cert_for_hostname(args.host, 443)
-    except socket.gaierror:
-        sys.stderr.write('Name or service not known\n')
+    if args.host is not None:
+        try:
+            cert = get_cert_for_hostname(args.host, 443)
+        except socket.gaierror:
+            sys.stderr.write('Name or service not known\n')
+            sys.exit(-1)
+    elif args.cert is not None:
+        if not os.path.isfile(args.cert):
+            sys.stderr.write('File not found\n')
+            sys.exit(-1)
+
+        with open(args.cert, 'rb') as f:
+            data = f.read()
+        cert = x509.load_pem_x509_certificate(data)
+    elif args.cert is None and args.host is None:
+        sys.stderr.write('Not enough arguments')
         sys.exit(-1)
+
     ca_issuer = get_issuer(cert)
     issuer_cert = get_issuer_cert(ca_issuer)
     ocsp_server = get_ocsp_server(cert)
@@ -84,6 +100,9 @@ def main():
 
     conn.close()
 
+    print(f'Hostname: {args.host}')
+    print(f'Issuer: {ca_issuer}')
+    print(f'OCSP Server: {ocsp_server}')
     print(f'Certificate Status: {rsp.read().decode()}')
 
 
