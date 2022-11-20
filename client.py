@@ -1,15 +1,23 @@
-import base64
+#!/bin/env python3
+
+
+import argparse
+import socket
 import ssl
+import base64
 import requests
-from urllib.parse import urljoin
+import sys
+
+import http.client as httplib
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.x509 import ocsp
-from cryptography.x509.ocsp import OCSPResponseStatus
 from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID
+
+from urllib.parse import urljoin
 
 import warnings
 
@@ -18,7 +26,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 def get_cert_for_hostname(hostname, port):
     conn = ssl.create_connection((hostname, port))
-    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)  # todo: DeprecationWarning: ssl.PROTOCOL_TLS is deprecated
+    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
     sock = context.wrap_socket(conn, server_hostname=hostname)
     certDER = sock.getpeercert(True)
     certPEM = ssl.DER_cert_to_PEM_cert(certDER)
@@ -50,34 +58,34 @@ def get_ocsp_server(cert):
     return ocsps[0].access_location.value
 
 
-def get_oscp_request(ocsp_server, cert, issuer_cert):
-    builder = ocsp.OCSPRequestBuilder()
-    builder = builder.add_certificate(cert, issuer_cert, SHA256())
-    req = builder.build()
-    req_path = base64.b64encode(req.public_bytes(serialization.Encoding.DER))
-    return urljoin(ocsp_server + '/', req_path.decode('ascii'))
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('host', type=str)
+    args = parser.parse_args()
 
-
-def get_ocsp_cert_status(ocsp_server, cert, issuer_cert):
-    ocsp_resp = requests.get(get_oscp_request(ocsp_server, cert, issuer_cert))
-    if ocsp_resp.ok:
-        ocsp_decoded = ocsp.load_der_ocsp_response(ocsp_resp.content)
-        if ocsp_decoded.response_status == OCSPResponseStatus.SUCCESSFUL:
-            return ocsp_decoded.certificate_status
-        else:
-            raise Exception(f'decoding ocsp response failed: {ocsp_decoded.response_status}')
-    raise Exception(f'fetching ocsp cert status failed with response status: {ocsp_resp.status_code}')
-
-
-def get_cert_status_for_host(hostname, port):
-    cert = get_cert_for_hostname(hostname, port)
+    try:
+        cert = get_cert_for_hostname(args.host, 443)
+    except socket.gaierror:
+        sys.stderr.write('Name or service not known\n')
+        sys.exit(-1)
     ca_issuer = get_issuer(cert)
     issuer_cert = get_issuer_cert(ca_issuer)
     ocsp_server = get_ocsp_server(cert)
-    return get_ocsp_cert_status(ocsp_server, cert, issuer_cert)
+
+    conn = httplib.HTTPConnection('127.0.0.1', 8080)
+
+    # Build OCSP request
+    ocsp_req = ocsp.OCSPRequestBuilder().add_certificate(cert, issuer_cert, SHA256()).build()
+    req_path = base64.b64encode(ocsp_req.public_bytes(serialization.Encoding.DER))
+
+    conn.request('GET', urljoin(ocsp_server + '/', req_path.decode('ascii')))
+
+    rsp = conn.getresponse()
+
+    conn.close()
+
+    print(f'Certificate Status: {rsp.read().decode()}')
 
 
 if __name__ == '__main__':
-    # Todo: command line arguments
-    status = get_cert_status_for_host('sigarra.up.pt', 443)
-    print(status)
+    main()
