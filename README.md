@@ -3,33 +3,35 @@
 ## Valid Certificate
 
 ```shell
-./responder.py
+./server.py
 ./client.py --host sigarra.up.pt --port 443
 ```
 
 ```shell
-./responder.py
+./server.py
 ./client.py --cert github.pem
 ```
 
 ## Revoked Certificate
 
 ```shell
-./responder.py
+./server.py
 ./client.py --host aaacertificateservices.comodoca.com --port 444
 ```
 
 ## Expired Certificate
 
 ```shell
-./responder.py
+./server.py
 ./client.py --host aaacertificateservices.comodoca.com --port 442
 ```
 
-## Self-Signed Cerificate (Error)
+## Self-Signed Cerificate (Supposed to fail)
 
 ```shell
 openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -sha256 -days 365 -subj '/CN=localhost'
-./responder.py
+# to see the certificate
+openssl x509 -in cert.pem -text
+./server.py
 ./client.py --cert cert.pem
 ```
