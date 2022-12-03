@@ -67,6 +67,10 @@ def main():
 
     args = parser.parse_args()
 
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(-1)
+
     if args.host is not None and args.port is not None:
         try:
             cert = get_cert_for_hostname(args.host, args.port)
@@ -84,6 +88,11 @@ def main():
     else:
         sys.stderr.write('Not enough arguments\n')
         sys.exit(-1)
+
+    if cert.not_valid_after.__str__() < datetime.now().__str__().split('.')[0]:
+        print('Certificate Status: Expired')
+        print(f'Expired in {cert.not_valid_after}')
+        return
 
     ca_issuer = get_issuer(cert)
     issuer_cert = get_issuer_cert(ca_issuer)
@@ -109,10 +118,6 @@ def main():
     cert_status = rsp.read().decode()
     if cert_status.strip() != '':
         print(f'Certificate Status: {cert_status}')
-    else:
-        if cert.not_valid_after.__str__() < datetime.now().__str__().split('.')[0]:
-            print('Certificate Status: Expired')
-            print(f'Expired in {cert.not_valid_after}')
 
 
 if __name__ == '__main__':
