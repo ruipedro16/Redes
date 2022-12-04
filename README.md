@@ -42,4 +42,5 @@ openssl x509 -in cert.pem -text
 
 ```shell
 ./delegated.py -o out
+./test.sh
 ```
