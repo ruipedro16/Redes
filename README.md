@@ -1,6 +1,8 @@
 # Redes
 
-## Valid Certificate
+## OCSP
+
+### Valid Certificate
 
 ```shell
 ./server.py
@@ -12,21 +14,21 @@
 ./client.py --cert github.pem
 ```
 
-## Revoked Certificate
+### Revoked Certificate
 
 ```shell
 ./server.py
 ./client.py --host aaacertificateservices.comodoca.com --port 444
 ```
 
-## Expired Certificate
+### Expired Certificate
 
 ```shell
 ./server.py
 ./client.py --host aaacertificateservices.comodoca.com --port 442
 ```
 
-## Self-Signed Cerificate (Supposed to fail)
+### Self-Signed Certificate (Should fail)
 
 ```shell
 openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -sha256 -days 365 -subj '/CN=localhost'
@@ -34,4 +36,10 @@ openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -sha256 
 openssl x509 -in cert.pem -text
 ./server.py
 ./client.py --cert cert.pem
+```
+
+## Dangerous Delegated Responder Certificate Problem
+
+```shell
+./delegated.py -o out
 ```
