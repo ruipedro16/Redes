@@ -41,6 +41,5 @@ openssl x509 -in cert.pem -text
 ## Dangerous Delegated Responder Certificate Problem
 
 ```shell
-./delegated.py -o out
 ./test.sh
 ```
