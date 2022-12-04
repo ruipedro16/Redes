@@ -20,7 +20,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         if ocsp_response.ok:
             ocsp_decoded = ocsp.load_der_ocsp_response(ocsp_response.content)
             if ocsp_decoded.response_status == OCSPResponseStatus.SUCCESSFUL:
-                self.wfile.write(ocsp_decoded.certificate_status.__str__().encode())
+                self.wfile.write(ocsp_response.content)
                 return
             else:
                 raise Exception(f'Decoding OCSP response failed: {ocsp_decoded.response_status}')

@@ -110,12 +110,15 @@ def main():
 
     conn.close()
 
+    rsp_bytes = rsp.read()
+    ocsp_decoded = ocsp.load_der_ocsp_response(rsp_bytes)
+    cert_status = ocsp_decoded.certificate_status.__str__()
+
     if args.host is not None:
         print(f'Hostname: {args.host}')
 
     print(f'Issuer: {ca_issuer}')
     print(f'OCSP Server: {ocsp_server}')
-    cert_status = rsp.read().decode()
     if cert_status.strip() != '':
         print(f'Certificate Status: {cert_status}')
 
