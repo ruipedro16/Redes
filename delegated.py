@@ -112,19 +112,19 @@ def build_crl(certs_to_revoke, issuer_cert, issuer_private_key, outpath=None):
 
 def create_rca_cert(issuer_private_key, outpath=None):
     subject_entries = [
-        (NameOID.COUNTRY_NAME, "US"),
-        (NameOID.ORGANIZATION_NAME, "Root CA"),
-        (NameOID.COMMON_NAME, "Root CA Name"),
+        (NameOID.COUNTRY_NAME, 'US'),
+        (NameOID.ORGANIZATION_NAME, 'Root CA'),
+        (NameOID.COMMON_NAME, 'Root CA Name'),
     ]
 
     issuer_entries = [
-        (NameOID.COUNTRY_NAME, "US"),
-        (NameOID.ORGANIZATION_NAME, "Root CA"),
-        (NameOID.COMMON_NAME, "Root CA Name"),
+        (NameOID.COUNTRY_NAME, 'US'),
+        (NameOID.ORGANIZATION_NAME, 'Root CA'),
+        (NameOID.COMMON_NAME, 'Root CA Name'),
     ]
 
-    not_before = datetime.fromisoformat("2011-01-01 11:11:11")
-    not_after = datetime.fromisoformat("2041-01-01 11:11:11")
+    not_before = datetime.fromisoformat('2011-01-01 11:11:11')
+    not_after = datetime.fromisoformat('2041-01-01 11:11:11')
     serial_number = x509.random_serial_number()
 
     # basic constraints
@@ -158,25 +158,25 @@ def create_rca_cert(issuer_private_key, outpath=None):
 
 def create_ica_cert(issuer_private_key, private_key, outpath=None):
     subject_entries = [
-        (NameOID.COUNTRY_NAME, "US"),
-        (NameOID.ORGANIZATION_NAME, "Intermediate CA"),
-        (NameOID.COMMON_NAME, "Intermediate CA Name"),
+        (NameOID.COUNTRY_NAME, 'US'),
+        (NameOID.ORGANIZATION_NAME, 'Intermediate CA'),
+        (NameOID.COMMON_NAME, 'Intermediate CA Name'),
     ]
     issuer_entries = [
-        (NameOID.COUNTRY_NAME, "US"),
-        (NameOID.ORGANIZATION_NAME, "Root CA"),
-        (NameOID.COMMON_NAME, "Root CA Name"),
+        (NameOID.COUNTRY_NAME, 'US'),
+        (NameOID.ORGANIZATION_NAME, 'Root CA'),
+        (NameOID.COMMON_NAME, 'Root CA Name'),
     ]
 
-    not_before = datetime.fromisoformat("2016-01-01 11:11:11")
-    not_after = datetime.fromisoformat("2031-01-01 11:11:11")
+    not_before = datetime.fromisoformat('2016-01-01 11:11:11')
+    not_after = datetime.fromisoformat('2031-01-01 11:11:11')
     serial_number = x509.random_serial_number()
 
     aia_descriptions = [
         x509.AccessDescription(x509.oid.AuthorityInformationAccessOID.OCSP,
-                               x509.UniformResourceIdentifier("http://ocsp.rootca.com")),
+                               x509.UniformResourceIdentifier('http://ocsp.rootca.com')),
         x509.AccessDescription(x509.oid.AuthorityInformationAccessOID.CA_ISSUERS,
-                               x509.UniformResourceIdentifier("http://sub.rootca.com/rca.crt")),
+                               x509.UniformResourceIdentifier('http://sub.rootca.com/rca.crt')),
     ]
 
     # basic constraints
@@ -185,11 +185,11 @@ def create_ica_cert(issuer_private_key, private_key, outpath=None):
 
     certificate_policies = [
         x509.PolicyInformation(x509.oid.CertificatePoliciesOID.ANY_POLICY,
-                               ["http://www.rootca.com/repo"]),
+                               ['http://www.rootca.com/repo']),
     ]
 
     crl_distribution_points = [
-        x509.DistributionPoint([x509.UniformResourceIdentifier("http://crl.rootca.com/rca.crl")],
+        x509.DistributionPoint([x509.UniformResourceIdentifier('http://crl.rootca.com/rca.crl')],
                                None, None, None)
     ]
 
@@ -224,32 +224,32 @@ def create_ica_cert(issuer_private_key, private_key, outpath=None):
 
 def create_sica_cert(issuer_private_key, private_key, outpath=None, ocsp_signing_eku=True):
     subject_entries = [
-        (NameOID.COUNTRY_NAME, "US"),
-        (NameOID.ORGANIZATION_NAME, "My Company"),
-        (NameOID.COMMON_NAME, "My Company Name"),
+        (NameOID.COUNTRY_NAME, 'US'),
+        (NameOID.ORGANIZATION_NAME, 'My Company'),
+        (NameOID.COMMON_NAME, 'My Company Name'),
     ]
 
     issuer_entries = [
-        (NameOID.COUNTRY_NAME, "US"),
-        (NameOID.ORGANIZATION_NAME, "Intermediate CA"),
-        (NameOID.COMMON_NAME, "Intermediate CA Name"),
+        (NameOID.COUNTRY_NAME, 'US'),
+        (NameOID.ORGANIZATION_NAME, 'Intermediate CA'),
+        (NameOID.COMMON_NAME, 'Intermediate CA Name'),
     ]
 
-    not_before = datetime.fromisoformat("2016-02-02 10:10:10")
-    not_after = datetime.fromisoformat("2022-02-02 10:10:10")
+    not_before = datetime.fromisoformat('2016-02-02 10:10:10')
+    not_after = datetime.fromisoformat('2023-02-02 10:10:10')
     serial_number = x509.random_serial_number()
 
     aia_descriptions = [
         x509.AccessDescription(x509.oid.AuthorityInformationAccessOID.CA_ISSUERS,
-                               x509.UniformResourceIdentifier("http://sub.rootca.com/ica.crt")),
+                               x509.UniformResourceIdentifier('http://sub.rootca.com/ica.crt')),
         x509.AccessDescription(x509.oid.AuthorityInformationAccessOID.OCSP,
-                               x509.UniformResourceIdentifier("http://ica.ocsp.rootca.com")),
+                               x509.UniformResourceIdentifier('http://ica.ocsp.rootca.com')),
     ]
 
     eku_usages = [
         x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
         x509.oid.ExtendedKeyUsageOID.EMAIL_PROTECTION,
-        x509.ObjectIdentifier("1.3.6.1.4.1.311.20.2.2"),  # smartcardLogon (Microsoft enhanced key usage)
+        x509.ObjectIdentifier('1.3.6.1.4.1.311.20.2.2'),  # smartcardLogon (Microsoft enhanced key usage)
     ]
 
     if ocsp_signing_eku:
@@ -261,12 +261,12 @@ def create_sica_cert(issuer_private_key, private_key, outpath=None, ocsp_signing
 
     certificate_policies = [
         x509.PolicyInformation(x509.oid.CertificatePoliciesOID.CPS_QUALIFIER,
-                               ["http://www.rootca.com/repo"]),
-        x509.PolicyInformation(x509.oid.CertificatePoliciesOID.CPS_QUALIFIER, ["http://www.mycompany.com/cp/"]),
+                               ['http://www.rootca.com/repo']),
+        x509.PolicyInformation(x509.oid.CertificatePoliciesOID.CPS_QUALIFIER, ['http://www.mycompany.com/cp/']),
     ]
 
     crl_distribution_points = [
-        x509.DistributionPoint([x509.UniformResourceIdentifier("http://crl.rootca.com/ica.crl")],
+        x509.DistributionPoint([x509.UniformResourceIdentifier('http://crl.rootca.com/ica.crl')],
                                None, None, None)
     ]
 
@@ -302,30 +302,30 @@ def create_sica_cert(issuer_private_key, private_key, outpath=None, ocsp_signing
 
 def create_ee_cert(issuer_private_key, private_key, outpath=None):
     subject_entries = [
-        (NameOID.COUNTRY_NAME, "US"),
-        (NameOID.ORGANIZATION_NAME, "My Company"),
-        (NameOID.COMMON_NAME, "firstname.lastname@mycompany.com"),
+        (NameOID.COUNTRY_NAME, 'US'),
+        (NameOID.ORGANIZATION_NAME, 'My Company'),
+        (NameOID.COMMON_NAME, 'firstname.lastname@mycompany.com'),
     ]
 
     issuer_entries = [
-        (NameOID.COUNTRY_NAME, "US"),
-        (NameOID.ORGANIZATION_NAME, "My Company"),
-        (NameOID.COMMON_NAME, "My Company Name"),
+        (NameOID.COUNTRY_NAME, 'US'),
+        (NameOID.ORGANIZATION_NAME, 'My Company'),
+        (NameOID.COMMON_NAME, 'My Company Name'),
     ]
 
-    not_before = datetime.fromisoformat("2016-08-08 15:15:15")
-    not_after = datetime.fromisoformat("2025-08-08 15:15:15")
+    not_before = datetime.fromisoformat('2016-08-08 15:15:15')
+    not_after = datetime.fromisoformat('2025-08-08 15:15:15')
     serial_number = x509.random_serial_number()
 
     aia_descriptions = [
         x509.AccessDescription(x509.oid.AuthorityInformationAccessOID.CA_ISSUERS,
-                               x509.UniformResourceIdentifier("http://sub.mycompany.com/sica.crt")),
+                               x509.UniformResourceIdentifier('http://sub.mycompany.com/sica.crt')),
     ]
 
     eku_usages = [
         x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
         x509.oid.ExtendedKeyUsageOID.EMAIL_PROTECTION,
-        x509.ObjectIdentifier("1.3.6.1.4.1.311.20.2.2"),  # smartcardLogon (Microsoft enhanced key usage)
+        x509.ObjectIdentifier('1.3.6.1.4.1.311.20.2.2'),  # smartcardLogon (Microsoft enhanced key usage)
     ]
 
     # basic constraints
@@ -333,7 +333,7 @@ def create_ee_cert(issuer_private_key, private_key, outpath=None):
     basic_constraints_pathlen = None
 
     certificate_policies = [
-        x509.PolicyInformation(x509.oid.CertificatePoliciesOID.CPS_QUALIFIER, ["http://www.mycompany.com/cp/"]),
+        x509.PolicyInformation(x509.oid.CertificatePoliciesOID.CPS_QUALIFIER, ['http://www.mycompany.com/cp/']),
     ]
 
     # key usage:  Signing only
@@ -341,12 +341,12 @@ def create_ee_cert(issuer_private_key, private_key, outpath=None):
 
     # subject alternative names
     subject_alternative_names = [
-        x509.DNSName("firstname.lastname@mycompany.com"),
+        x509.DNSName('firstname.lastname@mycompany.com'),
     ]
 
     crl_distribution_points = [
         x509.DistributionPoint(
-            [x509.UniformResourceIdentifier("http://crl.mycompany.com/sica.crl")],
+            [x509.UniformResourceIdentifier('http://crl.mycompany.com/sica.crl')],
             None, None, None)
     ]
 
@@ -393,7 +393,7 @@ def build_CA_Hierarchy(out_dir):
     print('\n')
 
     # Verify certificate signatures
-    print("Verifying certificate signatures ...")
+    print('Verifying certificate signatures ...')
     if verify_certificate_signature(rca, rca_private_key.public_key()):
         print('Valid signature for Root CA')
 
@@ -430,7 +430,7 @@ def build_CA_Hierarchy(out_dir):
 
     print('\n')
 
-    print("Verifying CRL signatures ...")
+    print('Verifying CRL signatures ...')
     if verify_crl_signature(rca_crl, rca_private_key.public_key()):
         print('Valid signature for Root CA')
 
